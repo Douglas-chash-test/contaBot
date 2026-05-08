@@ -1,0 +1,30 @@
+name: Agent Build
+
+on:
+  push:
+    paths:
+      - "agent/**"
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install uv
+
+      - working-directory: agent
+        run: uv sync
+
+      - working-directory: agent
+        run: uv run pyinstaller main.spec
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: contabot-agent
+          path: agent/dist/*.exe
