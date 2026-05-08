@@ -51,7 +51,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build imagem
-        run: docker build -t ghcr.io/Douglas-chash-test/contabot-api:latest ./orchestrator
+        run: docker build -t ghcr.io/douglas-chash-test/contabot-api:latest ./orchestrator
 
       - name: Push imagem
-        run: docker push ghcr.io/Douglas-chash-test/contabot-api:latest
+        run: docker push ghcr.io/douglas-chash-test/contabot-api:latest
