@@ -23,6 +23,7 @@ def upgrade() -> None:
         "clients",
         sa.Column("id", sa.Integer(), primary_key=True),
         sa.Column("cnpj", sa.String(length=14), nullable=False),
+        sa.Column("inscricao_estadual", sa.String(length=32), nullable=False),
         sa.Column("razao_social", sa.String(length=255), nullable=False),
         sa.Column("whatsapp_dest", sa.String(length=32), nullable=False),
         sa.Column("api_key_hash", sa.String(length=255), nullable=False),
