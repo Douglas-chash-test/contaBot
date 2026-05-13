@@ -10,6 +10,7 @@ class Client(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     cnpj: Mapped[str] = mapped_column(String(14), unique=True, index=True)
+    inscricao_estadual: Mapped[str] = mapped_column(String(32))
     razao_social: Mapped[str] = mapped_column(String(255))
     whatsapp_dest: Mapped[str] = mapped_column(String(32))
     api_key_hash: Mapped[str] = mapped_column(String(255))
