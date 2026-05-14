@@ -1,7 +1,3 @@
-from fastapi import FastAPI
+from app.server import app
 
-app = FastAPI()
-
-@app.get("/") 
-def read_root() -> dict[str, str]:
-    return {"status": "ok"}
+__all__ = ["app"]
