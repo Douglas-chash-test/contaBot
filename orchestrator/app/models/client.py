@@ -1,5 +1,5 @@
 from sqlalchemy import String
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -16,4 +16,5 @@ class Client(Base):
     api_key_hash: Mapped[str] = mapped_column(String(255))
     erp_type: Mapped[str] = mapped_column(String(64))
     db_type: Mapped[str] = mapped_column(String(64))
+    document_types: Mapped[list[str]] = mapped_column(ARRAY(String(16)))
     config_json: Mapped[dict[str, object]] = mapped_column(JSONB)

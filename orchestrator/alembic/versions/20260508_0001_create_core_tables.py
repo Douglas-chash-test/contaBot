@@ -30,9 +30,25 @@ def upgrade() -> None:
         sa.Column("erp_type", sa.String(length=64), nullable=False),
         sa.Column("db_type", sa.String(length=64), nullable=False),
         sa.Column(
+            "document_types",
+            postgresql.ARRAY(sa.String(length=16)),
+            nullable=False,
+        ),
+        sa.Column(
             "config_json",
             postgresql.JSONB(astext_type=sa.Text()),
             nullable=False,
+        ),
+        sa.CheckConstraint(
+            """
+            document_types <@ ARRAY['nfce', 'nfe', 'sintegra', 'cte']::varchar[]
+            AND cardinality(document_types) > 0
+            AND (
+                NOT ('cte' = ANY(document_types))
+                OR cardinality(document_types) = 1
+            )
+            """,
+            name="ck_clients_document_types_valid",
         ),
     )
     op.create_index("ix_clients_cnpj", "clients", ["cnpj"], unique=True)
