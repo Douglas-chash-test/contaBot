@@ -9,9 +9,7 @@ from app.db.base import Base
 
 class Command(Base):
     __tablename__ = "commands"
-    __table_args__ = (
-        Index("ix_commands_execution_status", "execution_id", "status"),
-    )
+    __table_args__ = (Index("ix_commands_execution_status", "execution_id", "status"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     execution_id: Mapped[int] = mapped_column(
