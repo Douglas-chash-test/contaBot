@@ -1,0 +1,24 @@
+from sqlalchemy.orm import Session
+
+from app.models.client import Client
+from app.schemas.clientSchema import ClientCreate
+
+
+def create_client(db: Session, payload: ClientCreate) -> Client:
+    client = Client(
+        cnpj=payload.cnpj,
+        inscricao_estadual=payload.inscricao_estadual,
+        razao_social=payload.razao_social,
+        whatsapp_dest=payload.whatsapp_dest,
+        api_key_hash="temporary",
+        erp_type=payload.erp_type,
+        db_type=payload.db_type,
+        document_types=list(payload.document_types),
+        config_json=payload.config_json,
+    )
+
+    db.add(client)
+    db.commit()
+    db.refresh(client)
+
+    return client
