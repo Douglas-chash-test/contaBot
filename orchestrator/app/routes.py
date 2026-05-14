@@ -1,4 +1,3 @@
-
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
@@ -15,19 +14,21 @@ routes = APIRouter()
 DbSession = Annotated[Session, Depends(get_db)]
 
 
-@routes.get("/") 
-def render_raiz() -> dict[str, str]: 
+@routes.get("/")
+def render_raiz() -> dict[str, str]:
     return raiz()
 
+
 @routes.get("/teste")
-def render_teste_api() -> dict[str, str]: 
+def render_teste_api() -> dict[str, str]:
     return teste_api()
 
+
 @routes.get("/teste/db")
-def render_teste_db(db: DbSession) -> dict[str, str]: 
+def render_teste_db(db: DbSession) -> dict[str, str]:
     return teste_db(db)
 
 
-@routes.post("/clients") 
+@routes.post("/clients")
 def render_create_client(db: DbSession, payload: ClientCreate) -> ClientRead:
     return create_client_controller(db, payload)

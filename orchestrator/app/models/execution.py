@@ -9,9 +9,7 @@ from app.db.base import Base
 
 class Execution(Base):
     __tablename__ = "executions"
-    __table_args__ = (
-        Index("ix_executions_client_periodo", "client_id", "periodo"),
-    )
+    __table_args__ = (Index("ix_executions_client_periodo", "client_id", "periodo"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     client_id: Mapped[int] = mapped_column(ForeignKey("clients.id", ondelete="CASCADE"))
