@@ -4,10 +4,12 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.controllers.clientController import create_client_controller
+from app.controllers.executionController import create_execution_controller
 from app.controllers.raizController import raiz
 from app.controllers.testeController import teste_api, teste_db
 from app.db.dependencies import get_db
 from app.schemas.clientSchema import ClientCreate, ClientRead
+from app.schemas.executionSchema import ExecutionRead, ExecutionStart
 
 routes = APIRouter()
 
@@ -32,3 +34,8 @@ def render_teste_db(db: DbSession) -> dict[str, str]:
 @routes.post("/clients")
 def render_create_client(db: DbSession, payload: ClientCreate) -> ClientRead:
     return create_client_controller(db, payload)
+
+
+@routes.post("/executions/start")
+def render_create_execution(db: DbSession, payload: ExecutionStart) -> ExecutionRead:
+    return create_execution_controller(db, payload)
