@@ -17,3 +17,8 @@ class ExecutionRead(BaseModel):
     finished_at: datetime | None
     log_json: dict[str, object]
     error_details: str | None
+
+
+class ExecutionDiagnose(BaseModel):
+    log_json: dict[str, object]
+    status: str | None

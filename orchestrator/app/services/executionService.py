@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from typing import Any, Dict
 
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -27,6 +28,22 @@ def create_execution(db: Session, payload: ExecutionStart) -> Execution:
         log_json={},
     )
     db.add(execution)
+    db.commit()
+    db.refresh(execution)
+    return execution
+
+
+def create_execution_diagnose(
+    db: Session, execution_id: int, log_json: Dict[str, Any]
+) -> Execution:
+    execution = db.get(Execution, execution_id)
+    if not execution:
+        raise ValueError("Execução não encontrada")
+
+    log_atual = execution.log_json or {}
+    log_atual["diagnostico"] = log_json
+    execution.log_json = log_atual
+    execution.status = "em_progresso"
     db.commit()
     db.refresh(execution)
     return execution
