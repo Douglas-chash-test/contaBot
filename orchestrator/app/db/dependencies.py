@@ -1,8 +1,13 @@
+import os
 from collections.abc import Generator
 
+from dotenv import load_dotenv
+from minio import Minio
 from sqlalchemy.orm import Session
 
 from app.db.session import SessionLocal
+
+load_dotenv()
 
 
 def get_db() -> Generator[Session]:
@@ -12,3 +17,12 @@ def get_db() -> Generator[Session]:
 
     finally:
         db.close()
+
+
+def get_minio() -> Minio:
+    return Minio(
+        "localhost:9000",
+        access_key=os.getenv("MINION_USER"),
+        secret_key=os.getenv("MINION_PASSWORD"),
+        secure=False,
+    )

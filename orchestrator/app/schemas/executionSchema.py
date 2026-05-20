@@ -22,3 +22,9 @@ class ExecutionRead(BaseModel):
 class ExecutionDiagnose(BaseModel):
     log_json: dict[str, object]
     status: str | None
+
+
+class ExecutionXmlsRead(BaseModel):
+    total_recebidos: int
+    storage_path: str
+    status: str
