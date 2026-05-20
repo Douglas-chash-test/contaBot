@@ -1,10 +1,20 @@
-from typing import Any, Dict
+from typing import Any, Dict, cast
 
-from fastapi import HTTPException, status
+from fastapi import HTTPException, UploadFile, status
+from minio import Minio
 from sqlalchemy.orm import Session
 
-from app.schemas.executionSchema import ExecutionDiagnose, ExecutionRead, ExecutionStart
-from app.services.executionService import create_execution, create_execution_diagnose
+from app.schemas.executionSchema import (
+    ExecutionDiagnose,
+    ExecutionRead,
+    ExecutionStart,
+    ExecutionXmlsRead,
+)
+from app.services.executionService import (
+    create_execution,
+    create_execution_diagnose,
+    upload_xmls,
+)
 
 
 def create_execution_controller(db: Session, payload: ExecutionStart) -> ExecutionRead:
@@ -36,4 +46,24 @@ def create_diagnose_controller(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
     return ExecutionDiagnose.model_validate(
         {"log_json": diagnose.log_json, "status": diagnose.status}
+    )
+
+
+def upload_xmls_controller(
+    db: Session, minio_client: Minio, execution_id: int, files: list[UploadFile]
+) -> ExecutionXmlsRead:
+    try:
+        execution = upload_xmls(db, minio_client, execution_id, files)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        ) from e
+
+    xmls = cast(dict[str, object], execution.log_json.get("xmls", {}))
+    return ExecutionXmlsRead.model_validate(
+        {
+            "total_recebidos": cast(int, xmls.get("total_recebidos", 0)),
+            "storage_path": cast(str, xmls.get("storage_path", "")),
+            "status": execution.status,
+        }
     )
