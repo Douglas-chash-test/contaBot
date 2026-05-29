@@ -7,15 +7,15 @@ from sqlalchemy.orm import Session
 from app.schemas.executionSchema import (
     ExecutionDiagnose,
     ExecutionRead,
+    ExecutionReportsRead,
     ExecutionStart,
     ExecutionXmlsRead,
-    ExecutionReportsRead,
 )
 from app.services.executionService import (
     create_execution,
     create_execution_diagnose,
-    upload_xmls,
     upload_reports,
+    upload_xmls,
 )
 
 

@@ -8,9 +8,8 @@ from app.controllers.clientController import create_client_controller
 from app.controllers.executionController import (
     create_diagnose_controller,
     create_execution_controller,
-    upload_xmls_controller,
     upload_reports_controller,
-    
+    upload_xmls_controller,
 )
 from app.controllers.raizController import raiz
 from app.controllers.testeController import teste_api, teste_db
@@ -19,9 +18,9 @@ from app.schemas.clientSchema import ClientCreate, ClientRead
 from app.schemas.executionSchema import (
     ExecutionDiagnose,
     ExecutionRead,
+    ExecutionReportsRead,
     ExecutionStart,
     ExecutionXmlsRead,
-    ExecutionReportsRead,
 )
 
 routes = APIRouter()
