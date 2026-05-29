@@ -8,6 +8,7 @@ from app.controllers.clientController import create_client_controller
 from app.controllers.executionController import (
     create_diagnose_controller,
     create_execution_controller,
+    upload_reports_controller,
     upload_xmls_controller,
 )
 from app.controllers.raizController import raiz
@@ -17,6 +18,7 @@ from app.schemas.clientSchema import ClientCreate, ClientRead
 from app.schemas.executionSchema import (
     ExecutionDiagnose,
     ExecutionRead,
+    ExecutionReportsRead,
     ExecutionStart,
     ExecutionXmlsRead,
 )
@@ -69,3 +71,12 @@ def render_upload_xmls(
     files: list[UploadFile] = File(...),
 ) -> ExecutionXmlsRead:
     return upload_xmls_controller(db, minio_client, execution_id, files)
+
+@routes.post("/executions/{execution_id}/reports")
+def render_upload_reports(
+    db: DbSession,
+    minio_client: MinioClient,
+    execution_id: int,
+    files: list[UploadFile] = File(...),
+) -> ExecutionReportsRead:
+    return upload_reports_controller(db, minio_client, execution_id, files)
