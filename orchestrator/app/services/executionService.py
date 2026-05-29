@@ -91,3 +91,38 @@ def upload_xmls(
     db.commit()
     db.refresh(execution)
     return execution
+
+def upload_reports(
+        db: Session,
+        minio_client: Minio, 
+        execution_id: int, 
+        files: list[UploadFile],
+        ) -> Execution:
+    execution = db.get(Execution, execution_id)
+    if not execution:
+        raise ValueError("Execução não encontrada")
+    log_atual = execution.log_json or {}
+    if execution.status != "em_progresso" or "xmls" not in log_atual:
+        raise ValueError("Execução não está em progresso ou xml não foi enviado")
+
+    storage_path = f"{execution.client_id}/{execution.periodo}/reports/"
+
+    for file in files:
+        filename = file.filename or ""
+        if not (filename.endswith(".pdf") or filename.endswith(".txt")):
+            raise ValueError(f"Arquivo {filename} não é um PDF ou TXT")
+
+        minio_client.put_object(
+            bucket_name="contabot",
+            object_name=f"{storage_path}{file.filename}",
+            data=file.file,
+            length=-1,
+            part_size=10 * 1024 * 1024,
+        )
+    log_atual["reports"] = {"total_recebidos": len(files), "storage_path": storage_path}
+    execution.log_json = log_atual
+    execution.status = "ready_for_validation"
+    flag_modified(execution, "log_json")
+    db.commit()
+    db.refresh(execution)
+    return execution

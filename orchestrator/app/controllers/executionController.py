@@ -9,11 +9,13 @@ from app.schemas.executionSchema import (
     ExecutionRead,
     ExecutionStart,
     ExecutionXmlsRead,
+    ExecutionReportsRead,
 )
 from app.services.executionService import (
     create_execution,
     create_execution_diagnose,
     upload_xmls,
+    upload_reports,
 )
 
 
@@ -64,6 +66,25 @@ def upload_xmls_controller(
         {
             "total_recebidos": cast(int, xmls.get("total_recebidos", 0)),
             "storage_path": cast(str, xmls.get("storage_path", "")),
+            "status": execution.status,
+        }
+    )
+
+def upload_reports_controller(
+    db: Session, minio_client: Minio, execution_id: int, files: list[UploadFile]
+) -> ExecutionReportsRead:
+    try:
+        execution = upload_reports(db, minio_client, execution_id, files)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        ) from e
+
+    reports = cast(dict[str, object], execution.log_json.get("reports", {}))
+    return ExecutionReportsRead.model_validate(
+        {
+            "total_recebidos": cast(int, reports.get("total_recebidos", 0)),
+            "storage_path": cast(str, reports.get("storage_path", "")),
             "status": execution.status,
         }
     )

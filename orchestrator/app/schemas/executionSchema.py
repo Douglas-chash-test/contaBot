@@ -28,3 +28,8 @@ class ExecutionXmlsRead(BaseModel):
     total_recebidos: int
     storage_path: str
     status: str
+
+class ExecutionReportsRead(BaseModel):
+    total_recebidos: int
+    storage_path: str
+    status: str
