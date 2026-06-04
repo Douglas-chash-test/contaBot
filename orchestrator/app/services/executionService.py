@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import flag_modified
 
 from app.models.execution import Execution
-from app.schemas.executionSchema import ExecutionStart
+from app.schemas.executionSchema import ExecutionFailureCreate, ExecutionStart
 
 
 def create_execution(db: Session, payload: ExecutionStart) -> Execution:
@@ -122,6 +122,36 @@ def upload_reports(
     log_atual["reports"] = {"total_recebidos": len(files), "storage_path": storage_path}
     execution.log_json = log_atual
     execution.status = "ready_for_validation"
+    flag_modified(execution, "log_json")
+    db.commit()
+    db.refresh(execution)
+    return execution
+
+def fail_execution(db: Session, 
+                   execution_id: int, 
+                   payload: ExecutionFailureCreate, 
+                   ) -> Execution:
+    
+    execution = db.get(Execution, execution_id)
+    if not execution:
+        raise ValueError("Execução não encontrada")
+    if execution.status in ["failed", "completed" , "ready_for_validation"]:
+        raise ValueError("Execução ja concluida!!")
+    
+    log_atual = execution.log_json or {}
+    failure_payload = payload.model_dump()
+
+    log_atual["failure"] = {
+        **failure_payload,
+        "reported_at": datetime.now(UTC).isoformat()
+    }
+
+
+    execution.status = "failed"
+    execution.finished_at = datetime.now(UTC)
+    execution.error_details = payload.message
+    execution.log_json = log_atual
+
     flag_modified(execution, "log_json")
     db.commit()
     db.refresh(execution)

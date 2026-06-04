@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 
 from app.schemas.executionSchema import (
     ExecutionDiagnose,
+    ExecutionFailureCreate,
+    ExecutionFailureRead,
     ExecutionRead,
     ExecutionReportsRead,
     ExecutionStart,
@@ -14,6 +16,7 @@ from app.schemas.executionSchema import (
 from app.services.executionService import (
     create_execution,
     create_execution_diagnose,
+    fail_execution,
     upload_reports,
     upload_xmls,
 )
@@ -86,5 +89,27 @@ def upload_reports_controller(
             "total_recebidos": cast(int, reports.get("total_recebidos", 0)),
             "storage_path": cast(str, reports.get("storage_path", "")),
             "status": execution.status,
+        }
+    )
+
+def fail_execution_controller(
+    db: Session, 
+    execution_id: int, 
+    payload: ExecutionFailureCreate
+) -> ExecutionFailureRead:
+    try:
+        execution = fail_execution(db, execution_id, payload)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        ) from e
+
+    return ExecutionFailureRead.model_validate(
+        {
+            "id": execution.id,
+            "status": execution.status,
+            "finished_at": execution.finished_at,
+            "error_details": execution.error_details,
+            "log_json": execution.log_json,
         }
     )

@@ -8,6 +8,7 @@ from app.controllers.clientController import create_client_controller
 from app.controllers.executionController import (
     create_diagnose_controller,
     create_execution_controller,
+    fail_execution_controller,
     upload_reports_controller,
     upload_xmls_controller,
 )
@@ -17,6 +18,8 @@ from app.db.dependencies import get_db, get_minio
 from app.schemas.clientSchema import ClientCreate, ClientRead
 from app.schemas.executionSchema import (
     ExecutionDiagnose,
+    ExecutionFailureCreate,
+    ExecutionFailureRead,
     ExecutionRead,
     ExecutionReportsRead,
     ExecutionStart,
@@ -80,3 +83,11 @@ def render_upload_reports(
     files: list[UploadFile] = File(...),
 ) -> ExecutionReportsRead:
     return upload_reports_controller(db, minio_client, execution_id, files)
+
+@routes.post("/executions/{execution_id}/failure")
+def render_fail_execution(
+    db: DbSession,
+    execution_id: int,
+    payload: ExecutionFailureCreate
+) -> ExecutionFailureRead:
+    return fail_execution_controller(db, execution_id, payload)
