@@ -156,3 +156,12 @@ def fail_execution(db: Session,
     db.commit()
     db.refresh(execution)
     return execution
+
+def get_execution_status(
+        db: Session,
+        execution_id: int
+            ) -> Execution:
+    execution = db.get(Execution, execution_id)
+    if not execution:
+        raise ValueError("Execução não encontrada")
+    return execution

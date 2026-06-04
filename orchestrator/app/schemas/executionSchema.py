@@ -45,3 +45,12 @@ class ExecutionFailureCreate(BaseModel):
     error_code: str | None = None
     message: str 
     details: dict[str, object] = Field(default_factory=dict)
+
+
+class ExecutionStatusGet(BaseModel):
+    id: int
+    status: str
+    started_at: datetime
+    finished_at: datetime | None
+    error_details: str | None
+    log_json: dict[str, object]
