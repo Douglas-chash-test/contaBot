@@ -9,6 +9,7 @@ from app.controllers.executionController import (
     create_diagnose_controller,
     create_execution_controller,
     fail_execution_controller,
+    get_execution_status_controller,
     upload_reports_controller,
     upload_xmls_controller,
 )
@@ -24,6 +25,7 @@ from app.schemas.executionSchema import (
     ExecutionReportsRead,
     ExecutionStart,
     ExecutionXmlsRead,
+    ExecutionStatusGet,
 )
 
 routes = APIRouter()
@@ -91,3 +93,10 @@ def render_fail_execution(
     payload: ExecutionFailureCreate
 ) -> ExecutionFailureRead:
     return fail_execution_controller(db, execution_id, payload)
+
+@routes.get("/executions/{execution_id}/status")
+def render_execution_status(
+    db: DbSession,
+    execution_id: int
+) -> ExecutionStatusGet:
+    return get_execution_status_controller(db, execution_id)

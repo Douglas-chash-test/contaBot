@@ -12,6 +12,7 @@ from app.schemas.executionSchema import (
     ExecutionReportsRead,
     ExecutionStart,
     ExecutionXmlsRead,
+    ExecutionStatusGet,
 )
 from app.services.executionService import (
     create_execution,
@@ -19,6 +20,7 @@ from app.services.executionService import (
     fail_execution,
     upload_reports,
     upload_xmls,
+    get_execution_status,
 )
 
 
@@ -108,6 +110,24 @@ def fail_execution_controller(
         {
             "id": execution.id,
             "status": execution.status,
+            "finished_at": execution.finished_at,
+            "error_details": execution.error_details,
+            "log_json": execution.log_json,
+        }
+    )
+
+def get_execution_status_controller( db:Session, execution_id:int) -> ExecutionStatusGet:
+    try:
+        execution = get_execution_status(db,execution_id)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
+        ) from e    
+    return ExecutionStatusGet.model_validate(
+        {
+            "id": execution.id,
+            "status": execution.status,
+            "started_at": execution.started_at,
             "finished_at": execution.finished_at,
             "error_details": execution.error_details,
             "log_json": execution.log_json,
