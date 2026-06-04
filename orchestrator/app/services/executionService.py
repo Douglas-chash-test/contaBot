@@ -157,7 +157,10 @@ def fail_execution(db: Session,
     db.refresh(execution)
     return execution
 
-def get_execution_status(db: Session, execution_id: int ) -> Execution:
+def get_execution_status(
+        db: Session,
+        execution_id: int
+            ) -> Execution:
     execution = db.get(Execution, execution_id)
     if not execution:
         raise ValueError("Execução não encontrada")

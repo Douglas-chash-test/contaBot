@@ -11,16 +11,16 @@ from app.schemas.executionSchema import (
     ExecutionRead,
     ExecutionReportsRead,
     ExecutionStart,
-    ExecutionXmlsRead,
     ExecutionStatusGet,
+    ExecutionXmlsRead,
 )
 from app.services.executionService import (
     create_execution,
     create_execution_diagnose,
     fail_execution,
+    get_execution_status,
     upload_reports,
     upload_xmls,
-    get_execution_status,
 )
 
 
@@ -116,9 +116,13 @@ def fail_execution_controller(
         }
     )
 
-def get_execution_status_controller( db:Session, execution_id:int) -> ExecutionStatusGet:
+def get_execution_status_controller( 
+        db:Session, 
+        execution_id:int
+        ) -> ExecutionStatusGet:
     try:
-        execution = get_execution_status(db,execution_id)
+        execution = get_execution_status(
+            db,execution_id)
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
