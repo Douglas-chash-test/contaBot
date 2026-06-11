@@ -66,7 +66,7 @@ services:
       - contabot
 
   minio:
-    image: minio/minio:latest
+    image: minio/minio
     container_name: contabot-minio
     restart: unless-stopped
     command: server /data --console-address ":9001"
