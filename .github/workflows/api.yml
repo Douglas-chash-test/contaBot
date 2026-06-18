@@ -15,6 +15,21 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: contabot_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
 
@@ -34,6 +49,13 @@ jobs:
         run: uv run mypy .
 
       - working-directory: orchestrator
+        env:
+          DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/contabot_test
+        run: uv run alembic upgrade head
+
+      - working-directory: orchestrator
+        env:
+          DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/contabot_test
         run: uv run pytest
 
   docker:
