@@ -1,8 +1,8 @@
 import uuid
-
-import pytest
 from collections.abc import Generator
 from typing import Any
+
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -41,16 +41,24 @@ def dados_client() -> dict[str, object]:
     }
 
 @pytest.fixture
-def client_criado(client: TestClient, dados_client: dict[str, object] , db: Session) -> Generator[dict[str, object], None, None]:
-        
-    res = client.post("/clients" , json=dados_client)
+def client_criado(
+    client: TestClient,
+    dados_client: dict[str, object],
+    db: Session,
+) -> Generator[dict[str, object], None, None]:
+    
+    res = client.post("/clients", json=dados_client)
     yield res.json()
     db.execute(text('DELETE FROM clients WHERE id = :id'),
                 {'id': res.json()['id']})
     db.commit()
 
 @pytest.fixture
-def execution(client_criado: dict[str, object], client: TestClient, db: Session) -> Generator[dict[str, object], None, None]:
+def execution(
+    client_criado: dict[str, object],
+    client: TestClient,
+    db: Session,
+) -> Generator[dict[str, object], None, None]:
 
     json_req = {
         "client_id": client_criado["id"],
@@ -65,7 +73,11 @@ def execution(client_criado: dict[str, object], client: TestClient, db: Session)
     db.commit()
 
 @pytest.fixture
-def execution_diagnose(client: TestClient, execution: dict[str, object], db: Session) -> Generator[dict[str, object], None, None]:
+def execution_diagnose(
+    client: TestClient,
+    execution: dict[str, object],
+    db: Session,
+) -> Generator[dict[str, object], None, None]:
 
     req_json = {
         "periodo": "2026-06",
@@ -85,7 +97,11 @@ def execution_diagnose(client: TestClient, execution: dict[str, object], db: Ses
     yield res.json()
 
 @pytest.fixture
-def execution_xml(client: TestClient, execution: dict[str, object], db: Session) -> Generator[Any, None, None]:
+def execution_xml(
+    client: TestClient,
+    execution: dict[str, object],
+    db: Session,
+) -> Generator[Any, None, None]:
 
     req_json = {
         "total_recebidos": "1",

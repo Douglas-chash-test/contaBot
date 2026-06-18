@@ -2,7 +2,10 @@
 from fastapi.testclient import TestClient
 
 
-def test_cria_client_valido(client: TestClient, dados_client: dict[str, object]) -> None:
+def test_cria_client_valido(
+    client: TestClient,
+    dados_client: dict[str, object],
+) -> None:
     res = client.post("/clients", json=dados_client)
     assert res.status_code == 200
 
@@ -34,7 +37,10 @@ def test_cnpj_ouverflow(client: TestClient, dados_client: dict[str, object]) -> 
     assert res.status_code == 422
     assert len(req_json["cnpj"]) > 14 
 
-def test_document_type_vazio(client: TestClient, dados_client: dict[str, object]) -> None:
+def test_document_type_vazio(
+    client: TestClient,
+    dados_client: dict[str, object],
+) -> None:
 
     req_json = {
         "cnpj": dados_client['cnpj'],

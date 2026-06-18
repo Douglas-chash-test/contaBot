@@ -1,6 +1,7 @@
 
-from fastapi.testclient import TestClient
 from typing import Any
+
+from fastapi.testclient import TestClient
 
 
 def test_execution_valido(client: TestClient, client_criado: dict[str, object]) -> None:
@@ -100,7 +101,10 @@ def test_execution_xml_valido(
     
     assert execution_xml.status_code == 200
 
-def test_execution_xml_invalido(client: TestClient , execution: dict[str, object]) -> None:
+def test_execution_xml_invalido(
+    client: TestClient,
+    execution: dict[str, object],
+) -> None:
     req_json = {
         "total_recebidos": "1",
         "storage_path": "/path/to/storage",

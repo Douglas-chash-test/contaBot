@@ -1,7 +1,6 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.models.command import Command
 from app.schemas.commandSchema import (
     CommandRead,
     CommandResultCreate,
