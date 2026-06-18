@@ -82,18 +82,18 @@ def render_upload_xmls(
     db: DbSession,
     minio_client: MinioClient,
     execution_id: int,
-    files: list[UploadFile] = File(...),
+    file: list[UploadFile] = File(...),
 ) -> ExecutionXmlsRead:
-    return upload_xmls_controller(db, minio_client, execution_id, files)
+    return upload_xmls_controller(db, minio_client, execution_id, file)
 
 @routes.post("/executions/{execution_id}/reports")
 def render_upload_reports(
     db: DbSession,
     minio_client: MinioClient,
     execution_id: int,
-    files: list[UploadFile] = File(...),
+    file: list[UploadFile] = File(...),
 ) -> ExecutionReportsRead:
-    return upload_reports_controller(db, minio_client, execution_id, files)
+    return upload_reports_controller(db, minio_client, execution_id, file)
 
 @routes.post("/executions/{execution_id}/failure")
 def render_fail_execution(
