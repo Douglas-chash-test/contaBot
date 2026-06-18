@@ -1,5 +1,5 @@
 from datetime import UTC, datetime
-from typing import Any, Dict
+from typing import Any, Dict, cast
 
 from fastapi import UploadFile
 from minio import Minio
@@ -61,7 +61,7 @@ def upload_xmls(
     if execution.status != "em_progresso":
         raise ValueError("Execução não está em progresso")
 
-    diagnostico = execution.log_json.get("diagnostico", {})
+    diagnostico = cast(dict[str, object], execution.log_json.get("diagnostico", {}))
     esperado = diagnostico.get("total_notas")
     if esperado != len(file):
         raise ValueError(

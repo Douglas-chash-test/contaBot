@@ -1,9 +1,12 @@
 
-def test_cria_client_valido(client, dados_client):
+from fastapi.testclient import TestClient
+
+
+def test_cria_client_valido(client: TestClient, dados_client: dict[str, object]) -> None:
     res = client.post("/clients", json=dados_client)
     assert res.status_code == 200
 
-def test_cnpj_duplicado(client , dados_client):
+def test_cnpj_duplicado(client: TestClient, dados_client: dict[str, object]) -> None:
     
     client.post("/clients", json=dados_client)
     res_duplicado = client.post(
@@ -14,11 +17,11 @@ def test_cnpj_duplicado(client , dados_client):
     
     
 
-def test_cnpj_ouverflow(client, dados_client):
+def test_cnpj_ouverflow(client: TestClient, dados_client: dict[str, object]) -> None:
 
     req_json = {
         "cnpj": "123456789012345",
-        "inscricao_estadual": dados_client['inscricao_estadual'],
+        "inscricao_estadual": str(dados_client['inscricao_estadual']),
         "razao_social": "Empresa Teste LTDA",
         "whatsapp_dest": "11987654321",
         "erp_type": "ERP Teste",
@@ -31,7 +34,7 @@ def test_cnpj_ouverflow(client, dados_client):
     assert res.status_code == 422
     assert len(req_json["cnpj"]) > 14 
 
-def test_document_type_vazio(client, dados_client):
+def test_document_type_vazio(client: TestClient, dados_client: dict[str, object]) -> None:
 
     req_json = {
         "cnpj": dados_client['cnpj'],
@@ -48,9 +51,9 @@ def test_document_type_vazio(client, dados_client):
     assert res.status_code == 422
 
 def test_document_type_incorreto(
-        client,
-        dados_client
-          ):
+        client: TestClient,
+        dados_client: dict[str, object]
+          ) -> None:
 
     req_json = {
         "cnpj": dados_client['cnpj'],

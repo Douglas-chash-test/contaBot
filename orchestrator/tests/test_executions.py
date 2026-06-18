@@ -1,5 +1,9 @@
 
-def test_execution_valido(client , client_criado):
+from fastapi.testclient import TestClient
+from typing import Any
+
+
+def test_execution_valido(client: TestClient, client_criado: dict[str, object]) -> None:
 
     req_json = {
         "client_id":client_criado['id'],
@@ -13,7 +17,7 @@ def test_execution_valido(client , client_criado):
     assert res.status_code == 200
     assert res.json()['status'] == "started"
 
-def test_client_invalido(client):
+def test_client_invalido(client: TestClient) -> None:
     req_json = {
         "client_id":9999999 ,
         "periodo": "2026-06"
@@ -26,9 +30,9 @@ def test_client_invalido(client):
     assert res.status_code == 404
 
 def test_execution_data_incorreta(
-        client,
-        client_criado
-        ):
+        client: TestClient,
+        client_criado: dict[str, object]
+        ) -> None:
     
     req_json = {
         "client_id":client_criado['id'],
@@ -42,9 +46,9 @@ def test_execution_data_incorreta(
     assert res.status_code == 422
 
 def test_execution_diagnose_valida(
-        client, 
-        execution
-          ):
+        client: TestClient,
+        execution: dict[str, object]
+          ) -> None:
     
     req_json = {
         "periodo": "2026-06",
@@ -66,7 +70,7 @@ def test_execution_diagnose_valida(
           )
     assert res.status_code == 200
 
-def test_execution_diagnose_invalida(client):
+def test_execution_diagnose_invalida(client: TestClient) -> None:
 
     req_json = {
         "periodo": "2026-06",
@@ -89,16 +93,16 @@ def test_execution_diagnose_invalida(client):
     assert res.status_code == 404
 
 def test_execution_xml_valido(
-        execution , 
-        execution_diagnose ,
-        execution_xml
-        ):
+        execution: dict[str, object],
+        execution_diagnose: dict[str, object],
+        execution_xml: Any
+        ) -> None:
     
     assert execution_xml.status_code == 200
 
-def test_execution_xml_invalido(client , execution):
+def test_execution_xml_invalido(client: TestClient , execution: dict[str, object]) -> None:
     req_json = {
-        "total_recebidos": 1,
+        "total_recebidos": "1",
         "storage_path": "/path/to/storage",
     }
 
@@ -119,13 +123,13 @@ def test_execution_xml_invalido(client , execution):
     assert res.status_code == 400
 
 def test_execution_no_xml(
-        client, 
-        execution, 
-        execution_diagnose
-        ):
+        client: TestClient, 
+        execution: dict[str, object], 
+        execution_diagnose: dict[str, object]
+        ) -> None:
     
     req_json = {
-        "total_recebidos": 1,
+        "total_recebidos": "1",
         "storage_path": "/path/to/storage",
     }
 
@@ -146,13 +150,13 @@ def test_execution_no_xml(
     assert res.status_code == 400 
 
 def test_execution_xml_incompativel(
-        client,
-        execution,
-        execution_diagnose
-        ):
+        client: TestClient,
+        execution: dict[str, object],
+        execution_diagnose: dict[str, object]
+        ) -> None:
     
     req_json = {
-        "total_recebidos": 1,
+        "total_recebidos": "1",
         "storage_path": "/path/to/storage",
     }
 

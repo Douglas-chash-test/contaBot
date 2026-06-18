@@ -35,7 +35,7 @@ def command_result_controller(
         db: Session,
         command_id: int,
         payload: CommandResultCreate
-) -> Command:
+) -> CommandResultRead:
     try:
         command = command_result(db, command_id, payload)
     except ValueError as e:

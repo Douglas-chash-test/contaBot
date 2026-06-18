@@ -1,25 +1,28 @@
 import uuid
 
 import pytest
+from collections.abc import Generator
+from typing import Any
 from fastapi.testclient import TestClient
 from sqlalchemy import text
+from sqlalchemy.orm import Session
 
 from app.db.dependencies import get_db
 from app.server import app
 
 
 @pytest.fixture
-def db():
+def db() -> Generator[Session, None, None]:
     db = next(get_db())
     yield db
     db.close()
 
 @pytest.fixture
-def client():
+def client() -> TestClient:
     return TestClient(app)
 
 @pytest.fixture
-def dados_client():
+def dados_client() -> dict[str, object]:
     cnpj = str(uuid.uuid4().int)
     ins = str(uuid.uuid4().int)
 
@@ -38,7 +41,7 @@ def dados_client():
     }
 
 @pytest.fixture
-def client_criado(client, dados_client , db):
+def client_criado(client: TestClient, dados_client: dict[str, object] , db: Session) -> Generator[dict[str, object], None, None]:
         
     res = client.post("/clients" , json=dados_client)
     yield res.json()
@@ -47,7 +50,7 @@ def client_criado(client, dados_client , db):
     db.commit()
 
 @pytest.fixture
-def execution(client_criado, client, db):
+def execution(client_criado: dict[str, object], client: TestClient, db: Session) -> Generator[dict[str, object], None, None]:
 
     json_req = {
         "client_id": client_criado["id"],
@@ -62,7 +65,7 @@ def execution(client_criado, client, db):
     db.commit()
 
 @pytest.fixture
-def execution_diagnose(client, execution, db):
+def execution_diagnose(client: TestClient, execution: dict[str, object], db: Session) -> Generator[dict[str, object], None, None]:
 
     req_json = {
         "periodo": "2026-06",
@@ -82,10 +85,10 @@ def execution_diagnose(client, execution, db):
     yield res.json()
 
 @pytest.fixture
-def execution_xml(client, execution, db):
+def execution_xml(client: TestClient, execution: dict[str, object], db: Session) -> Generator[Any, None, None]:
 
     req_json = {
-        "total_recebidos": 1,
+        "total_recebidos": "1",
         "storage_path": "/path/to/storage",
     }
 
