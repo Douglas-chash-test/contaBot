@@ -20,9 +20,14 @@ def get_db() -> Generator[Session]:
 
 
 def get_minio() -> Minio:
-    return Minio(
-        "localhost:9000",
+    client = Minio(
+        os.getenv("MINIO_ENDPOINT", "localhost:9000"),
         access_key=os.getenv("MINION_USER"),
         secret_key=os.getenv("MINION_PASSWORD"),
         secure=False,
     )
+
+    if not client.bucket_exists("contabot"):
+        client.make_bucket("contabot")
+
+    return client
