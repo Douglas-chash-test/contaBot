@@ -104,6 +104,7 @@ def test_execution_xml_valido(
 def test_execution_xml_invalido(
     client: TestClient,
     execution: dict[str, object],
+    xml_temp: str
 ) -> None:
     req_json = {
         "total_recebidos": "1",
@@ -111,12 +112,9 @@ def test_execution_xml_invalido(
     }
 
     req_fild = [
-        ("file",
-        ("31180821367015000162550010000000051000000058-nfe.xml", 
-        open(r"C:\Users\tutol\Documents\31180821367015000162550010000000051000000058-nfe.xml", 
-        "rb")
-        , "application/xml"))
+    ("file", ("nfe_teste.xml", open(xml_temp, "rb"), "application/xml"))
     ]
+
 
     res = client.post(
         f"/executions/{execution['id']}/xmls", 
@@ -129,7 +127,8 @@ def test_execution_xml_invalido(
 def test_execution_no_xml(
         client: TestClient, 
         execution: dict[str, object], 
-        execution_diagnose: dict[str, object]
+        execution_diagnose: dict[str, object],
+        docx_temp: str
         ) -> None:
     
     req_json = {
@@ -138,12 +137,9 @@ def test_execution_no_xml(
     }
 
     req_fild = [
-        ("file",
-        ("Douglas.docx",
-        open(r"C:\Users\tutol\Documents\Douglas.docx", 
-        "rb"), 
-        "application/xml"))
-    ]
+    ("file", ("nfe_teste.docx", open(docx_temp, "rb"), "application/xml"))
+]
+
 
     res = client.post(
         f"/executions/{execution['id']}/xmls",
@@ -156,7 +152,8 @@ def test_execution_no_xml(
 def test_execution_xml_incompativel(
         client: TestClient,
         execution: dict[str, object],
-        execution_diagnose: dict[str, object]
+        execution_diagnose: dict[str, object],
+        xml_temp: str
         ) -> None:
     
     req_json = {
@@ -165,19 +162,11 @@ def test_execution_xml_incompativel(
     }
 
     req_fild = [
-
-        ("file",
-        ("31180821367015000162550010000000051000000058-nfe.xml", 
-         open(r"C:\Users\tutol\Documents\31180821367015000162550010000000051000000058-nfe.xml", 
-        "rb"),
-        "application/xml")),
-
-        ("file",
-        ("31180821367015000162550010000000051000000058-nfe.xml", 
-        open(r"C:\Users\tutol\Documents\31180821367015000162550010000000051000000058-nfe.xml",
-        "rb"), 
-        "application/xml"))
+    ("file", ("nfe_teste.xml", open(xml_temp, "rb"), "application/xml")),
+    ("file", ("nfe_teste.xml", open(xml_temp, "rb"), "application/xml"))
     ]
+
+    
 
     res = client.post(
         f"/executions/{execution['id']}/xmls",

@@ -1,3 +1,5 @@
+import os
+import tempfile
 import uuid
 from collections.abc import Generator
 from typing import Any
@@ -9,6 +11,35 @@ from sqlalchemy.orm import Session
 
 from app.db.dependencies import get_db
 from app.server import app
+
+
+@pytest.fixture
+def xml_temp() -> Generator[Any,Any,Any]: 
+    xml_content = b'''
+    <?xml version="1.0"
+     encoding="UTF-8"?><nfe><infNFe 
+     Id="1"></infNFe></nfe>
+     '''
+
+    with tempfile.NamedTemporaryFile(suffix=".xml", delete=False) as f:
+        f.write(xml_content)
+        tmp_path = f.name
+
+    yield tmp_path
+    os.remove(tmp_path)
+
+@pytest.fixture
+def docx_temp() -> Generator[Any,Any,Any]:
+    with tempfile.NamedTemporaryFile(
+        suffix=".docx", 
+        delete=False
+        ) as f:
+
+        f.write(b"conteudo qualquer")
+        tmp_path = f.name
+    yield tmp_path
+    os.remove(tmp_path)
+
 
 
 @pytest.fixture
@@ -101,6 +132,7 @@ def execution_xml(
     client: TestClient,
     execution: dict[str, object],
     db: Session,
+    xml_temp:str
 ) -> Generator[Any, None, None]:
 
     req_json = {
@@ -109,11 +141,7 @@ def execution_xml(
     }
 
     req_fild = [
-        ("file",
-        ("31180821367015000162550010000000051000000058-nfe.xml",
-        open(r"C:\Users\tutol\Documents\31180821367015000162550010000000051000000058-nfe.xml",
-        "rb"), 
-        "application/xml"))
+    ("file", ("nfe_teste.xml", open(xml_temp, "rb"), "application/xml"))
     ]
 
     res = client.post(
