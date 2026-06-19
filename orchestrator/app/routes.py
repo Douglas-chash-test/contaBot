@@ -5,7 +5,10 @@ from minio import Minio
 from sqlalchemy.orm import Session
 
 from app.controllers.clientController import create_client_controller
-from app.controllers.commandController import get_command_controller
+from app.controllers.commandController import (
+    command_result_controller,
+    get_command_controller,
+)
 from app.controllers.executionController import (
     create_diagnose_controller,
     create_execution_controller,
@@ -18,7 +21,11 @@ from app.controllers.raizController import raiz
 from app.controllers.testeController import teste_api, teste_db
 from app.db.dependencies import get_db, get_minio
 from app.schemas.clientSchema import ClientCreate, ClientRead
-from app.schemas.commandSchema import CommandRead
+from app.schemas.commandSchema import (
+    CommandRead,
+    CommandResultCreate,
+    CommandResultRead,
+)
 from app.schemas.executionSchema import (
     ExecutionDiagnose,
     ExecutionFailureCreate,
@@ -75,18 +82,18 @@ def render_upload_xmls(
     db: DbSession,
     minio_client: MinioClient,
     execution_id: int,
-    files: list[UploadFile] = File(...),
+    file: list[UploadFile] = File(...),
 ) -> ExecutionXmlsRead:
-    return upload_xmls_controller(db, minio_client, execution_id, files)
+    return upload_xmls_controller(db, minio_client, execution_id, file)
 
 @routes.post("/executions/{execution_id}/reports")
 def render_upload_reports(
     db: DbSession,
     minio_client: MinioClient,
     execution_id: int,
-    files: list[UploadFile] = File(...),
+    file: list[UploadFile] = File(...),
 ) -> ExecutionReportsRead:
-    return upload_reports_controller(db, minio_client, execution_id, files)
+    return upload_reports_controller(db, minio_client, execution_id, file)
 
 @routes.post("/executions/{execution_id}/failure")
 def render_fail_execution(
@@ -109,3 +116,11 @@ def render_get_command(
     execution_id: int
 ) -> list[CommandRead]:
     return get_command_controller(db,execution_id)
+
+@routes.post("/commands/{command_id}/result")
+def render_command_result(
+    db: DbSession,
+    command_id: int,
+    payload: CommandResultCreate
+) -> CommandResultRead:
+    return command_result_controller(db, command_id, payload)

@@ -53,7 +53,7 @@ def create_execution_diagnose(
 
 
 def upload_xmls(
-    db: Session, minio_client: Minio, execution_id: int, files: list[UploadFile]
+    db: Session, minio_client: Minio, execution_id: int, file: list[UploadFile]
 ) -> Execution:
     execution = db.get(Execution, execution_id)
     if not execution:
@@ -62,30 +62,30 @@ def upload_xmls(
         raise ValueError("Execução não está em progresso")
 
     diagnostico = cast(dict[str, object], execution.log_json.get("diagnostico", {}))
-    esperado = int(cast(int, diagnostico.get("total_notas", 0)))
-    if esperado != len(files):
+    esperado = diagnostico.get("total_notas")
+    if esperado != len(file):
         raise ValueError(
-            f"Quantidade de XMLs recebidos ({len(files)}) "
+            f"Quantidade de XMLs recebidos ({len(file)}) "
             f"não corresponde ao total de notas ({esperado})"
         )
 
-    for file in files:
-        filename = file.filename or ""
+    for files in file:
+        filename = files.filename or ""
         if not filename.endswith(".xml"):
             raise ValueError(f"Arquivo {filename} não é um XML")
 
     storage_path = f"{execution.client_id}/{execution.periodo}/xmls/"
 
-    for file in files:
+    for files in file:
         minio_client.put_object(
             bucket_name="contabot",
-            object_name=f"{storage_path}{file.filename}",
-            data=file.file,
+            object_name=f"{storage_path}{files.filename}",
+            data=files.file,
             length=-1,
             part_size=10 * 1024 * 1024,
         )
     log_atual = execution.log_json or {}
-    log_atual["xmls"] = {"total_recebidos": len(files), "storage_path": storage_path}
+    log_atual["xmls"] = {"total_recebidos": len(file), "storage_path": storage_path}
     execution.log_json = log_atual
     flag_modified(execution, "log_json")
     db.commit()
@@ -96,7 +96,7 @@ def upload_reports(
         db: Session,
         minio_client: Minio, 
         execution_id: int, 
-        files: list[UploadFile],
+        file: list[UploadFile],
         ) -> Execution:
     execution = db.get(Execution, execution_id)
     if not execution:
@@ -107,19 +107,19 @@ def upload_reports(
 
     storage_path = f"{execution.client_id}/{execution.periodo}/reports/"
 
-    for file in files:
-        filename = file.filename or ""
+    for files in file:
+        filename = files.filename or ""
         if not (filename.endswith(".pdf") or filename.endswith(".txt")):
             raise ValueError(f"Arquivo {filename} não é um PDF ou TXT")
 
         minio_client.put_object(
             bucket_name="contabot",
-            object_name=f"{storage_path}{file.filename}",
-            data=file.file,
+            object_name=f"{storage_path}{files.filename}",
+            data=files.file,
             length=-1,
             part_size=10 * 1024 * 1024,
         )
-    log_atual["reports"] = {"total_recebidos": len(files), "storage_path": storage_path}
+    log_atual["reports"] = {"total_recebidos": len(file), "storage_path": storage_path}
     execution.log_json = log_atual
     execution.status = "ready_for_validation"
     flag_modified(execution, "log_json")

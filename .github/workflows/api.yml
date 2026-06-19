@@ -15,6 +15,21 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: contabot_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
 
@@ -33,7 +48,24 @@ jobs:
       - working-directory: orchestrator
         run: uv run mypy .
 
+      - name: Subir MinIO
+        run: |
+          docker run -d -p 9000:9000 \
+            -e MINIO_ROOT_USER=minioadmin \
+            -e MINIO_ROOT_PASSWORD=minioadmin \
+            minio/minio server /data
+
       - working-directory: orchestrator
+        env:
+          DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/contabot_test
+        run: uv run alembic upgrade head
+
+      - working-directory: orchestrator
+        env:
+          DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/contabot_test
+          MINIO_ENDPOINT: localhost:9000
+          MINION_USER: minioadmin
+          MINION_PASSWORD: minioadmin
         run: uv run pytest
 
   docker:

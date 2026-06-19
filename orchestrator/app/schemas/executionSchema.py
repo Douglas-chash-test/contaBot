@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 class ExecutionStart(BaseModel):
     client_id: int
-    periodo: str = Field(min_length=7, max_length=7)
+    periodo: str = Field(pattern=r"^\d{4}-\d{2}$")
 
 
 class ExecutionRead(BaseModel):
