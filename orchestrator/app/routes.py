@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.controllers.clientController import create_client_controller
 from app.controllers.commandController import (
+    command_create_controller,
     command_result_controller,
     get_command_controller,
 )
@@ -22,6 +23,7 @@ from app.controllers.testeController import teste_api, teste_db
 from app.db.dependencies import get_db, get_minio
 from app.schemas.clientSchema import ClientCreate, ClientRead
 from app.schemas.commandSchema import (
+    CommandCreate,
     CommandRead,
     CommandResultCreate,
     CommandResultRead,
@@ -124,3 +126,10 @@ def render_command_result(
     payload: CommandResultCreate
 ) -> CommandResultRead:
     return command_result_controller(db, command_id, payload)
+
+@routes.post("/commands")
+def render_command_create(
+    db:DbSession,
+    Payload: CommandCreate
+)-> CommandRead:
+    return command_create_controller(db, Payload)

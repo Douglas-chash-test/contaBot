@@ -107,7 +107,6 @@ def execution(
 def execution_diagnose(
     client: TestClient,
     execution: dict[str, object],
-    db: Session,
 ) -> Generator[dict[str, object], None, None]:
 
     req_json = {
@@ -131,7 +130,6 @@ def execution_diagnose(
 def execution_xml(
     client: TestClient,
     execution: dict[str, object],
-    db: Session,
     xml_temp:str
 ) -> Generator[Any, None, None]:
 
@@ -151,6 +149,61 @@ def execution_xml(
          )
     yield res
     
+@pytest.fixture
+def commands(
+    client: TestClient,
+    execution: dict[str, object],
+    db: Session,
+    ) -> Generator[dict[str, object], None, None]:
+
+    req = {
+        "execution_id": execution['id'],
+        "type": "ncm_update",
+        "payload":{"sql":'''UPDATE produto
+                            SET ncm = 12345678
+                            where descricao = protudo_X
+                   '''} ,
+        "status": "pendente",
+    }
+
+    res = client.post("/commands", json=req)
+    yield  res.json()
+    db.execute(text('''DELETE FROM commands WHERE id = :id'''), 
+               {'id':res.json()['id']})
+    db.commit()
+
+@pytest.fixture
+def get_commands(
+    client: TestClient,
+    execution: dict[str, object],
+) -> Generator[dict[str, object], None, None]:
+
+    res = client.get(f"/executions/{execution['id']}/commands/")
+    yield res.json()
     
 
-
+@pytest.fixture
+def result_commands(
+    client: TestClient,
+    get_commands:dict[str, object],
+    db:Session
+) -> Generator[dict[str, object], None, None]:
+    req = {
+        "status":"executed",
+        "result_json": {
+            "result": {
+                "status": "sucesso",
+                "metadados": {
+                    "origem": "webhook",
+                    "tentativas": 1
+                },
+                "processado": True,
+                "codigo_retorno": 200
+            },
+            "success": True,
+            "error_message": ""
+    }
+     }
+    
+    res = client.post(f"/commands/{get_commands['id']}/result", json=req)
+    yield res.json()

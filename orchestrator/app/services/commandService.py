@@ -1,10 +1,38 @@
 from datetime import UTC, datetime
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.models.command import Command
 from app.models.execution import Execution
-from app.schemas.commandSchema import CommandResultCreate
+from app.schemas.commandSchema import CommandCreate, CommandResultCreate
+
+
+def create_command(
+        db: Session,
+        Payload: CommandCreate
+)-> Command:
+    execution = db.get(Execution, Payload.execution_id)
+    if not execution :
+        raise ValueError('A execução relacionada ao comando a ser criado não existe!!')
+    command = Command(
+        execution_id=Payload.execution_id,
+        type=Payload.type,
+        payload=Payload.payload,
+        status=Payload.status,
+        sent_at=datetime.now(UTC)
+    )
+    db.add(command)
+    try:
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise ValueError(
+            "Erro ao criar comando"
+        ) from exc
+
+    db.refresh(command)
+    return command
 
 
 def get_command(
