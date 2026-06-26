@@ -2,14 +2,12 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.schemas.commandSchema import (
+    CommandCreate,
     CommandRead,
     CommandResultCreate,
     CommandResultRead,
 )
-from app.services.commandService import (
-    command_result,
-    get_command,
-)
+from app.services.commandService import command_result, create_command, get_command
 
 
 def get_command_controller(db: Session, execution_id: int) -> list[CommandRead]:
@@ -29,6 +27,28 @@ def get_command_controller(db: Session, execution_id: int) -> list[CommandRead]:
          } )
         for command in commands
          ]
+
+def command_create_controller(
+        db: Session,
+        Payload: CommandCreate
+)-> CommandRead:
+    try:
+        command = create_command(db, Payload)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e), 
+        )from e
+    return CommandRead.model_validate(
+        {
+        "id":command.id,
+        "execution_id":command.execution_id,
+        "type":command.type,
+        "payload":command.payload,
+        "status":command.status,
+        "sent_at":command.sent_at
+        }
+    )
 
 def command_result_controller(
         db: Session,
